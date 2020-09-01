@@ -235,12 +235,29 @@ function doWxss(dir, cb, mainDir, nowDir) {
             //remove setCssToHead function
             mainCode = mainCode.replace('var setCssToHead = function', 'var setCssToHead2 = function');
 
-            code = code.slice(code.lastIndexOf('var setCssToHead = function(file, _xcInvalid'));
-            code = code.slice(code.lastIndexOf('\nvar _C= ') + 1);
-
-            code = code.slice(0, code.indexOf('\n'));
-            let vm = new VM({sandbox: {}});
-            pureData = vm.run(code + "\n_C");
+            let COMMON_STYLESHEETS = code.slice(
+                code.lastIndexOf("\nvar __COMMON_STYLESHEETS__") + 1
+            );
+            COMMON_STYLESHEETS = COMMON_STYLESHEETS.slice(
+                0,
+                COMMON_STYLESHEETS.lastIndexOf(
+                    "\nvar setCssToHead = function(file, _xcInvalid"
+                )
+            );
+    
+            code = code.slice(
+                code.lastIndexOf("var setCssToHead = function(file, _xcInvalid")
+            );
+            code = code.slice(
+                Math.max(
+                    code.lastIndexOf("\nvar _C="),
+                    code.lastIndexOf("\nvar _C =")
+                ) + 1
+            );
+    
+            code = code.slice(0, code.indexOf("\n"));
+            let vm = new VM({ sandbox: {} });
+            pureData = vm.run(COMMON_STYLESHEETS + "\n" + code + "\n_C");
 
 			console.log("Guess wxss(first turn)...");
             preRun(dir, frameFile, mainCode, files, () => {

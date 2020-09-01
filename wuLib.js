@@ -81,6 +81,7 @@ function mkdirs(dir, cb) {
 }
 
 function save(name, content) {
+    name = name.replace(/plugin-private:/g, '__plugin__');
     ioEvent.encount();
     mkdirs(path.dirname(name), () => ioLimit.runWithCb(fs.writeFile.bind(fs), name, content, err => {
         if (err) throw Error("Save file error: " + err);
